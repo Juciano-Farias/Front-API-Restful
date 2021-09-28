@@ -47,11 +47,34 @@
                     const productsHtml = data.map(products => `
                         <li>
                             ${products.name} - ${products.brand} - ${products.price}
+                            <a href="#" class="botao-excluir" data-id="${products._id}">[Excluir]</a>
                         </li>
                     `).join('')
 
                     productsList.innerHTML = productsHtml
 
+                    const botoesExcluir = document.querySelectorAll('.botao-excluir')
+
+                    botoesExcluir.forEach(botao => {
+                        botao.onclick = function(e) {
+                            e.preventDefault()
+
+                            const id = this.dataset.id
+
+                            fetch(`${API_URL}/${id}`,{
+                                method: 'DELETE'
+                            }).then(response => {
+                                response.json().then(data => {
+                                    if(data.messege === 'Success') {
+                                        ObterList()
+                                        alert('Produto excluido com sucesso')
+                                    } else {
+                                        alert('Algo deu errado')
+                                    }
+                                })
+                            })
+                        }
+                    })
                 })    
             })
         }
