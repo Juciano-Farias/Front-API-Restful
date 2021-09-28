@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Listagem de produtos</h2>
+
+    <ul id="products-list"></ul>
+
+    <hr>
+
+    <h2>Cadastro de produtos</h2>
+    <form id="form">
+        <div>
+            <label>Nome</label>
+            <input type="text" name="name">
+        </div>
+        <div>
+            <label>Marca</label>
+            <input type="text" name="brand">
+        </div>
+        <div>
+            <label>Preço</label>
+            <input type="text" name="price">
+        </div>
+        <div>
+            <button type="submit">Cadastrar</button>
+        </div>
+    </form>
+
+
+
+    <script>
+        const API_URL = 'http://localhost:8080/api/products'
+
+        const form = document.querySelector('#form') 
+        let productsList = document.querySelector('#products-list') 
+
+        //OBTÉM A LISTA DE PRODUTOS
+        function ObterList() {
+            fetch(API_URL).then(response => {
+                response.json().then(data => {
+                    const productsHtml = data.map(products => `
+                        <li>
+                            ${products.name} - ${products.brand} - ${products.price}
+                        </li>
+                    `).join('')
+
+                    productsList.innerHTML = productsHtml
+
+                })    
+            })
+        }
+
+        ObterList()
+        //AO CADASTRAR UM PRODUTO
+        form.onsubmit = function(e) {
+            e.preventDefault()
+
+            const name = document.forms['form'].name.value
+            const brand = document.forms['form'].brand.value
+            const price = document.forms['form'].price.value
+
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name,
+                    brand,
+                    price
+                })
+            }).then(response => {
+                response.json().then(data => {
+                    if (data.message === 'Success') {
+                        form.reset()
+                        ObterList()
+                        alert('Cadastro realizado com sucesso')
+                    } else {
+                        alert('Ops, ocorreu um erro')
+                    }
+                })
+            })
+        } 
+    </script>
+</body>
+</html>
